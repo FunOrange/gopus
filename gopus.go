@@ -15,6 +15,7 @@ var (
 	opus                 = windows.NewLazyDLL("opus.dll")
 	opus_encoder_create  = opus.NewProc("opus_encoder_create")
 	opus_encode          = opus.NewProc("opus_encode")
+	opus_encode_float    = opus.NewProc("opus_encode_float")
 	opus_encoder_destroy = opus.NewProc("opus_encoder_destroy")
 )
 
@@ -64,7 +65,7 @@ func CreateEncoder(fs int, channels int, application Application) (Encoder, erro
 // frameSize: Number of samples per frame of input signal (e.g., 960 for 20ms at 48kHz).
 // maxDataBytes: Size of the output buffer.
 // Returns the length of the encoded packet in bytes.
-func (e Encoder) Encode(pcm []int16, frameSize int32, data []byte) (int32, error) {
+func (e Encoder) EncodeInt16(pcm []int16, frameSize int32, data []byte) (int32, error) {
 	if e == 0 {
 		return 0, errors.New("encoder is not initialized")
 	}
@@ -75,6 +76,34 @@ func (e Encoder) Encode(pcm []int16, frameSize int32, data []byte) (int32, error
 	// We pass the address of the first element of the slices.
 	// We cast the length of 'data' to int32 for the max_data_bytes parameter.
 	ret, _, _ := opus_encode.Call(
+		uintptr(e),
+		uintptr(unsafe.Pointer(&pcm[0])),
+		uintptr(frameSize),
+		uintptr(unsafe.Pointer(&data[0])),
+		uintptr(int32(len(data))),
+	)
+
+	// In opus_encode, a negative return value is an error code.
+	// A positive value is the number of bytes written to 'data'.
+	res := int32(ret)
+	if res < 0 {
+		return 0, Error(res)
+	}
+
+	return res, nil
+}
+
+func (e Encoder) EncodeFloat32(pcm []float32, frameSize int32, data []byte) (int32, error) {
+	if e == 0 {
+		return 0, errors.New("encoder is not initialized")
+	}
+	if len(pcm) == 0 {
+		return 0, errors.New("pcm is empty")
+	}
+
+	// We pass the address of the first element of the slices.
+	// We cast the length of 'data' to int32 for the max_data_bytes parameter.
+	ret, _, _ := opus_encode_float.Call(
 		uintptr(e),
 		uintptr(unsafe.Pointer(&pcm[0])),
 		uintptr(frameSize),

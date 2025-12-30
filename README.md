@@ -42,7 +42,7 @@ func main() {
 	frameSize := int32(960)
 	pcm := make([]int16, frameSize)
 	out := make([]byte, frameSize)
-	ret, err := encoder.Encode(pcm, frameSize, out)
+	ret, err := encoder.EncodeInt16(pcm, frameSize, out)
 	if err != nil {
 		panic(err)
 	}
