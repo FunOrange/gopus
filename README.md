@@ -29,11 +29,11 @@ import "github.com/FunOrange/gopus"
 This example creates an opus encoder, encodes 960 samples of silence, then destroys the encoder.
 
 ```go
-func TestEncodeSilence(t *testing.T) {
+func main() {
 	fs := 48000
 	channels := 1
-	application := OPUS_APPLICATION_AUDIO
-	encoder, err := CreateEncoder(fs, channels, application)
+	application := gopus.OPUS_APPLICATION_AUDIO
+	encoder, err := gopus.CreateEncoder(fs, channels, application)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -44,13 +44,8 @@ func TestEncodeSilence(t *testing.T) {
 	out := make([]byte, frameSize)
 	ret, err := encoder.Encode(pcm, frameSize, out)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
-	t.Logf("encoded %d bytes -> %d bytes\n", len(pcm)*2, ret)
-
-	// TODO: idk how to verify encoded data
-
-	fmt.Printf("\n")
+	fmt.Printf("encoded %d bytes -> %d bytes\n", len(pcm)*2, ret)
 }
-
 ```
