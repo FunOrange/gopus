@@ -26,7 +26,7 @@ import "github.com/FunOrange/gopus"
 
 ### Usage
 
-This example creates an opus encoder, encodes 960 samples of silence, then destroys the encoder.
+This example creates an opus encoder, encodes a 20ms frame of silence, then destroys the encoder.
 
 ```go
 func main() {
