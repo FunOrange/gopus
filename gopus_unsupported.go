@@ -1,19 +1,11 @@
-//go:build windows
-// +build windows
+//go:build !windows
+// +build !windows
 
 package gopus
 
 import (
+	"errors"
 	"fmt"
-	"unsafe"
-
-	"golang.org/x/sys/windows"
-)
-
-var (
-	opus                 = windows.NewLazyDLL("opus.dll")
-	opus_encoder_create  = opus.NewProc("opus_encoder_create")
-	opus_encoder_destroy = opus.NewProc("opus_encoder_destroy")
 )
 
 type Encoder uintptr // opaque pointer to an Opus encoder
@@ -44,21 +36,7 @@ func (e Error) Error() string {
 }
 
 func CreateEncoder(fs int, channels int, application Application) (Encoder, error) {
-	var errCode int32
-	encoder, _, _ := opus_encoder_create.Call(
-		uintptr(int32(fs)),
-		uintptr(int32(channels)),
-		uintptr(int32(application)),
-		uintptr(unsafe.Pointer(&errCode)),
-	)
-	if errCode != OPUS_OK {
-		return 0, Error(errCode)
-	}
-	return Encoder(encoder), nil
+	return 0, errors.New("gopus: not implemented on this platform")
 }
 
-func (e Encoder) Destroy() {
-	if e != 0 {
-		opus_encoder_destroy.Call(uintptr(e))
-	}
-}
+func (e Encoder) Destroy() {}
