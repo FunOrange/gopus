@@ -55,6 +55,9 @@ func CreateEncoder(fs int, channels int, application Application) (Encoder, erro
 		uintptr(unsafe.Pointer(&errCode)),
 	)
 	if errCode != OPUS_OK {
+		if errCode == OPUS_BAD_ARG {
+			return 0, fmt.Errorf("OPUS_BAD_ARG: opus_encoder_create(%d, %d, %d, [ptr])", fs, channels, application)
+		}
 		return 0, Error(errCode)
 	}
 	return Encoder(encoder), nil
